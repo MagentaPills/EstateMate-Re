@@ -172,6 +172,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCZpPsSgm9bnBeed7nRuHJOBc7MGhH0jpQ",
@@ -186,6 +187,7 @@
     const app  = window._emApp || initializeApp(firebaseConfig);
     window._emApp = app;
     const auth = getAuth(app);
+    const db   = getFirestore(app);
 
     // navbar & form
     const signInBtn  = document.getElementById("signInBtn");
@@ -206,12 +208,49 @@
         hide(signInBtn);
         show(signOutBtn);
         if (mobileAuthLink) mobileAuthLink.textContent = "Sign out";
+
+        // 🔹 Prefill contact form with user info
+        if (buyerName && !buyerName.value) {
+          const baseName =
+            user.displayName ||
+            (user.email ? user.email.split("@")[0] : "");
+          if (baseName) buyerName.value = baseName;
+        }
+
+        if (buyerEmail && !buyerEmail.value && user.email) {
+          buyerEmail.value = user.email;
+        }
+
+        // Try to fetch extra details (like phone) from Firestore if available
+        if (buyerPhone && !buyerPhone.value) {
+          (async () => {
+            try {
+              const snap = await getDoc(doc(db, "users", user.uid));
+              if (snap.exists()) {
+                const data = snap.data();
+
+                if (data.phone && !buyerPhone.value) {
+                  buyerPhone.value = data.phone;
+                }
+
+                if (!buyerName.value && (data.firstName || data.lastName)) {
+                  buyerName.value = [data.firstName, data.lastName]
+                    .filter(Boolean)
+                    .join(" ");
+                }
+              }
+            } catch (err) {
+              console.error("Failed to load user contact info:", err);
+            }
+          })();
+        }
       } else {
         show(signInBtn);
         hide(signOutBtn);
         if (mobileAuthLink) mobileAuthLink.textContent = "Sign in / account";
       }
     });
+
 
     signOutBtn?.addEventListener("click", async () => { try{await signOut(auth);}catch{} window.location.href="auth.html"; });
 
