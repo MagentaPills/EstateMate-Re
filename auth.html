@@ -249,220 +249,215 @@
 
   <!-- Firebase auth logic (unchanged from your original file),
        PLUS navbar toggle so the Sign in / Sign out pill matches everywhere. -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      GoogleAuthProvider,
-      signInWithPopup,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+       <script type="module">
+         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+         import {
+           getAuth,
+           onAuthStateChanged,
+           GoogleAuthProvider,
+           signInWithPopup,
+           createUserWithEmailAndPassword,
+           signInWithEmailAndPassword,
+           signOut
+         } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+         import {
+           getFirestore,
+           doc,
+           setDoc,
+           serverTimestamp
+         } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-    const cfg = {
-      apiKey: "AIzaSyCZpPsSgm9bnBeed7nRuHJOBc7MGhH0jpQ",
-      authDomain: "estatemate-d54e1.firebaseapp.com",
-      projectId: "estatemate-d54e1",
-      storageBucket: "estatemate-d54e1.firebasestorage.app",
-      messagingSenderId: "745236119215",
-      appId: "1:745236119215:web:7170303f7be0010ad79e5a",
-      measurementId: "G-RXWF5891QM"
-    };
+         const cfg = {
+           apiKey: "AIzaSyCZpPsSgm9bnBeed7nRuHJOBc7MGhH0jpQ",
+           authDomain: "estatemate-d54e1.firebaseapp.com",
+           projectId: "estatemate-d54e1",
+           storageBucket: "estatemate-d54e1.appspot.com",
+           messagingSenderId: "745236119215",
+           appId: "1:745236119215:web:7170303f7be0010ad79e5a",
+           measurementId: "G-RXWF5891QM"
+         };
 
-    // Safe init / reuse
-    const app  = window._emApp || initializeApp(cfg);
-    window._emApp = app;
+         // Initialize (or reuse) app safely
+         const app = getApps().length ? getApp() : initializeApp(cfg);
+         const auth = getAuth(app);
+         const db   = getFirestore(app);
+         const HOME = "index.html";
 
-    const auth = getAuth(app);
-    const db   = getFirestore(app);
-    const HOME = "index.html";
+         // Navbar elements
+         const signInBtn       = document.getElementById("signInBtn");
+         const signOutBtn      = document.getElementById("signOutBtn");
+         const mobileAuthLink  = document.getElementById("mobileAuthLink");
+         const alertBox        = document.getElementById("authAlert");
 
-    // ----- Navbar sign-in / sign-out pill toggle (same as index.html) -----
-    const signInBtn  = document.getElementById("signInBtn");
-    const signOutBtn = document.getElementById("signOutBtn");
+         let currentUser = null;
 
-    const mobileAuthLink = document.getElementById("mobileAuthLink");
-    let currentUser = null;
+         function show(el){ el && el.classList.remove("hidden"); }
+         function hide(el){ el && el.classList.add("hidden"); }
 
-    function show(el){ el?.classList.remove("hidden"); }
-    function hide(el){ el?.classList.add("hidden"); }
+         function flash(type, text) {
+           if (!alertBox) return;
+           alertBox.className = "rounded-lg border px-4 py-3 text-sm";
+           if (type === "error") {
+             alertBox.classList.add("border-red-200","bg-red-50","text-red-800");
+           } else if (type === "success") {
+             alertBox.classList.add("border-green-200","bg-green-50","text-green-800");
+           } else {
+             alertBox.classList.add("border-gray-200","bg-gray-50","text-gray-700");
+           }
+           alertBox.textContent = text;
+           alertBox.classList.remove("hidden");
+         }
+         function clearFlash(){ alertBox && alertBox.classList.add("hidden"); }
 
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user;
+         function humanizeAuthError(code) {
+           switch (code) {
+             case "auth/invalid-credential":
+             case "auth/wrong-password":
+               return "Incorrect email or password.";
+             case "auth/user-not-found":
+               return "No account found with that email.";
+             case "auth/email-already-in-use":
+               return "That email is already in use.";
+             case "auth/weak-password":
+               return "Please use a stronger password (at least 6–8 characters).";
+             case "auth/too-many-requests":
+               return "Too many attempts. Please try again later.";
+             case "auth/popup-blocked":
+             case "auth/popup-closed-by-user":
+               return "Google sign-in was cancelled or blocked.";
+             case "auth/unauthorized-domain":
+               return "This website domain is not allowed in Firebase Auth. Add it under 'Authorized domains' in the Firebase console.";
+             default:
+               return "Something went wrong. Please try again.";
+           }
+         }
 
-      if (user) {
-        hide(signInBtn);
-        show(signOutBtn);
-        if (mobileAuthLink) mobileAuthLink.textContent = "Sign out";
-      } else {
-        show(signInBtn);
-        hide(signOutBtn);
-        if (mobileAuthLink) mobileAuthLink.textContent = "Sign in / account";
-      }
-    });
+         // Keep nav in sync with auth state
+         onAuthStateChanged(auth, (user) => {
+           currentUser = user;
+           if (user) {
+             hide(signInBtn);
+             show(signOutBtn);
+             if (mobileAuthLink) mobileAuthLink.textContent = "Sign out";
+           } else {
+             show(signInBtn);
+             hide(signOutBtn);
+             if (mobileAuthLink) mobileAuthLink.textContent = "Sign in / account";
+           }
+         });
 
+         signOutBtn?.addEventListener("click", async () => {
+           try {
+             await signOut(auth);
+             flash("success", "Signed out.");
+           } catch (err) {
+             console.error("Sign-out error:", err);
+             flash("error", humanizeAuthError(err?.code));
+           }
+         });
 
-    signOutBtn?.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error("Sign-out error:", err);
-      }
-      // after sign-out, stay on auth so they can log in again
-      // OR if you prefer, redirect to HOME — your call.
-      // window.location.href = "auth.html";
-    });
+         mobileAuthLink?.addEventListener("click", async (e) => {
+           if (!currentUser) return; // logged out -> just go to auth.html
+           e.preventDefault();
+           try {
+             await signOut(auth);
+             window.location.href = "auth.html";
+           } catch (err) {
+             console.error("Sign-out error:", err);
+             flash("error", humanizeAuthError(err?.code));
+           }
+         });
 
-    mobileAuthLink?.addEventListener("click", async (e) => {
-      // Logged out → normal behaviour, go to auth.html
-      if (!currentUser) return;
+         // Google Sign-In
+         const googleBtn = document.getElementById("googleBtn");
+         if (googleBtn) {
+           const provider = new GoogleAuthProvider();
+           googleBtn.addEventListener("click", async () => {
+             clearFlash();
+             googleBtn.disabled = true;
+             try {
+               const cred = await signInWithPopup(auth, provider);
+               await setDoc(doc(db, "users", cred.user.uid), {
+                 email: cred.user.email ?? null,
+                 displayName: cred.user.displayName ?? null,
+                 photoURL: cred.user.photoURL ?? null,
+                 providers: cred.user.providerData.map(p => p.providerId),
+                 createdAt: serverTimestamp(),
+                 lastLoginAt: serverTimestamp()
+               }, { merge: true });
+               window.location.replace(HOME);
+             } catch (err) {
+               console.error(err);
+               flash("error", humanizeAuthError(err?.code));
+             } finally {
+               googleBtn.disabled = false;
+             }
+           });
+         }
 
-      // Logged in → sign out then go to auth
-      e.preventDefault();
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error("Sign-out error:", err);
-      }
-      window.location.href = "auth.html";
-    });
+         // Email login
+         const loginFormEl = document.getElementById("loginForm");
+         const loginSubmit = document.getElementById("loginSubmit");
+         loginFormEl?.addEventListener("submit", async (e) => {
+           e.preventDefault();
+           clearFlash();
+           if (loginSubmit) loginSubmit.disabled = true;
+           try {
+             const email = document.getElementById("loginEmail").value.trim();
+             const pass  = document.getElementById("loginPassword").value;
+             const cred  = await signInWithEmailAndPassword(auth, email, pass);
+             await setDoc(doc(db, "users", cred.user.uid), {
+               lastLoginAt: serverTimestamp()
+             }, { merge: true });
+             window.location.replace(HOME);
+           } catch (err) {
+             console.error(err);
+             flash("error", humanizeAuthError(err?.code));
+           } finally {
+             if (loginSubmit) loginSubmit.disabled = false;
+           }
+         });
 
-    // ----- alert helpers for auth flows -----
-    const alertBox = document.getElementById("authAlert");
-    function flash(type, text) {
-      if (!alertBox) return;
-      alertBox.className = "rounded-lg border px-4 py-3 text-sm";
-      if (type === "error") {
-        alertBox.classList.add("border-red-200","bg-red-50","text-red-800");
-      } else if (type === "success") {
-        alertBox.classList.add("border-green-200","bg-green-50","text-green-800");
-      } else {
-        alertBox.classList.add("border-gray-200","bg-gray-50","text-gray-700");
-      }
-      alertBox.textContent = text;
-      alertBox.classList.remove("hidden");
-    }
-    function clearFlash(){ alertBox?.classList.add("hidden"); }
-    function humanizeAuthError(code) {
-      switch (code) {
-        case "auth/invalid-credential":
-        case "auth/wrong-password":
-          return "Incorrect email or password.";
-        case "auth/user-not-found":
-          return "No account found with that email.";
-        case "auth/email-already-in-use":
-          return "That email is already in use.";
-        case "auth/weak-password":
-          return "Please use a stronger password (at least 6–8 characters).";
-        case "auth/too-many-requests":
-          return "Too many attempts. Please try again later.";
-        case "auth/popup-blocked":
-        case "auth/popup-closed-by-user":
-          return "Google sign-in was cancelled or blocked.";
-        default:
-          return "Something went wrong. Please try again.";
-      }
-    }
+         // Email sign-up
+         const signupFormEl = document.getElementById("signupForm");
+         const signupSubmit = document.getElementById("signupSubmit");
+         signupFormEl?.addEventListener("submit", async (e) => {
+           e.preventDefault();
+           clearFlash();
+           if (signupSubmit) signupSubmit.disabled = true;
 
-    // ----- Google Sign-In -----
-    const googleBtn = document.getElementById("googleBtn");
-    if (googleBtn) {
-      const provider = new GoogleAuthProvider();
-      googleBtn.addEventListener("click", async () => {
-        clearFlash();
-        googleBtn.disabled = true;
-        try {
-          const cred = await signInWithPopup(auth, provider);
-          await setDoc(doc(db, "users", cred.user.uid), {
-            email: cred.user.email ?? null,
-            displayName: cred.user.displayName ?? null,
-            photoURL: cred.user.photoURL ?? null,
-            providers: cred.user.providerData.map(p => p.providerId),
-            createdAt: serverTimestamp(),
-            lastLoginAt: serverTimestamp()
-          }, { merge: true });
-          window.location.replace(HOME);
-        } catch (err) {
-          flash("error", humanizeAuthError(err?.code));
-        } finally {
-          googleBtn.disabled = false;
-        }
-      });
-    }
+           try {
+             const email    = document.getElementById("signupEmail").value.trim();
+             const pass     = document.getElementById("signupPassword").value;
+             const confirm  = document.getElementById("signupConfirm").value;
+             const first    = document.getElementById("firstName")?.value || null;
+             const last     = document.getElementById("lastName")?.value || null;
 
-    // ----- Email Login -----
-    const loginFormEl = document.getElementById("loginForm");
-    const loginSubmit = document.getElementById("loginSubmit");
-    loginFormEl?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      clearFlash();
-      loginSubmit && (loginSubmit.disabled = true);
-      try {
-        const email = document.getElementById("loginEmail").value.trim();
-        const pass  = document.getElementById("loginPassword").value;
-        const cred  = await signInWithEmailAndPassword(auth, email, pass);
+             if (pass !== confirm) {
+               flash("error", "Passwords do not match.");
+               throw new Error("password-mismatch");
+             }
 
-        await setDoc(doc(db, "users", cred.user.uid), {
-          lastLoginAt: serverTimestamp()
-        }, { merge: true });
+             const cred = await createUserWithEmailAndPassword(auth, email, pass);
+             await setDoc(doc(db, "users", cred.user.uid), {
+               email,
+               firstName: first,
+               lastName: last,
+               providers: ["password"],
+               createdAt: serverTimestamp(),
+               lastLoginAt: serverTimestamp()
+             }, { merge: true });
 
-        window.location.replace(HOME);
-      } catch (err) {
-        flash("error", humanizeAuthError(err?.code));
-      } finally {
-        loginSubmit && (loginSubmit.disabled = false);
-      }
-    });
-
-    // ----- Email Sign-Up -----
-    const signupFormEl = document.getElementById("signupForm");
-    const signupSubmit = document.getElementById("signupSubmit");
-    signupFormEl?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      clearFlash();
-      signupSubmit && (signupSubmit.disabled = true);
-
-      try {
-        const email = document.getElementById("signupEmail").value.trim();
-        const pass  = document.getElementById("signupPassword").value;
-        const confirm = document.getElementById("signupConfirm").value;
-        if (pass !== confirm) throw { code: "auth/password-mismatch" };
-
-        const first = document.getElementById("firstName")?.value || null;
-        const last  = document.getElementById("lastName")?.value || null;
-
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-        await setDoc(doc(db, "users", cred.user.uid), {
-          email,
-          firstName: first,
-          lastName: last,
-          providers: ["password"],
-          createdAt: serverTimestamp(),
-          lastLoginAt: serverTimestamp()
-        }, { merge: true });
-
-        window.location.replace(HOME);
-      } catch (err) {
-        if (err.code === "auth/password-mismatch") {
-          flash("error", "Passwords do not match.");
-        } else {
-          flash("error", humanizeAuthError(err?.code));
-        }
-      } finally {
-        signupSubmit && (signupSubmit.disabled = false);
-      }
-    });
-
-  </script>
+             window.location.replace(HOME);
+           } catch (err) {
+             if (err.message === "password-mismatch") return;
+             console.error(err);
+             flash("error", humanizeAuthError(err?.code));
+           } finally {
+             if (signupSubmit) signupSubmit.disabled = false;
+           }
+         });
+       </script>
   <script>
     (function () {
       const btn  = document.getElementById('mobileMenuBtn');
