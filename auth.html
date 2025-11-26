@@ -335,16 +335,21 @@
          // Keep nav in sync with auth state
          onAuthStateChanged(auth, (user) => {
            currentUser = user;
+
            if (user) {
              hide(signInBtn);
              show(signOutBtn);
              if (mobileAuthLink) mobileAuthLink.textContent = "Sign out";
+
+             // 🔥 ALWAYS BOOT LOGGED-IN USERS TO INDEX
+             window.location.replace(HOME);
            } else {
              show(signInBtn);
              hide(signOutBtn);
              if (mobileAuthLink) mobileAuthLink.textContent = "Sign in / account";
            }
          });
+
 
          signOutBtn?.addEventListener("click", async () => {
            try {
