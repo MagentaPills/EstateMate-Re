@@ -12,7 +12,7 @@
       background-repeat:no-repeat;}
   </style>
 </head>
-<body class="min-h-screen text-gray-900 flex flex-col">
+<body class="min-h-screen text-gray-900 flex flex-col overflow-x-hidden">
   <header class="bg-white/95 backdrop-blur border-b border-gray-100 sticky top-0 z-40">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.07),transparent_60%)] pointer-events-none"></div>
     <div class="relative z-10 max-w-7xl mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
@@ -47,8 +47,8 @@
     </section>
 
     <!-- Filters -->
-    <section class="mt-8 flex flex-col items-center gap-4">
-      <div class="w-full flex flex-col lg:flex-row lg:items-center lg:justify-center gap-4">
+    <section class="mt-8 flex flex-col items-stretch gap-4">
+      <div class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
         <input
           id="cityFilter"
           class="w-full lg:w-auto flex-1 rounded-xl border border-gray-300 bg-white/80 px-4 py-3 shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 text-[15px] placeholder-gray-400"

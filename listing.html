@@ -22,7 +22,7 @@
     .slider-dot.active{background:#6366f1}
   </style>
 </head>
-<body class="min-h-screen text-gray-900 flex flex-col">
+<body class="min-h-screen text-gray-900 flex flex-col overflow-x-hidden">
   <header class="bg-white border-b border-gray-100 relative overflow-hidden">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.07),transparent_60%)] pointer-events-none"></div>
     <div class="relative z-10 max-w-7xl mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
@@ -51,7 +51,7 @@
     </header>
 
     <section class="mt-8 grid lg:grid-cols-2 gap-6">
-      <div class="bg-white rounded-xl shadow overflow-hidden slider-frame w-full h-[360px] md:h-[480px]" id="sliderWrapper">
+      <div class="bg-white rounded-xl shadow overflow-hidden slider-frame w-full h-[260px] sm:h-[340px] md:h-[480px]" id="sliderWrapper">
         <div id="sliderTrack" class="slider-track"></div>
         <button id="sliderPrev" class="slider-btn prev" aria-label="Previous photo">&#10094;</button>
         <button id="sliderNext" class="slider-btn next" aria-label="Next photo">&#10095;</button>

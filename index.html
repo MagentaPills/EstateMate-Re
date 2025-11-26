@@ -27,7 +27,7 @@
     .chip input{accent-color:#4f46e5}
   </style>
 </head>
-<body class="min-h-screen bg-gray-50 relative text-gray-900 flex flex-col">
+<body class="min-h-screen text-gray-900 flex flex-col overflow-x-hidden">
   <div class="bg-blob blob-1 pointer-events-none"></div>
   <div class="bg-blob blob-2 pointer-events-none"></div>
 
@@ -68,7 +68,7 @@
       </section>
 
       <!-- Chat window -->
-      <section class="relative bg-white/80 backdrop-blur border border-white/40 shadow-xl rounded-2xl overflow-hidden flex flex-col max-h:[70vh] min-h-[480px]">
+      <section class="relative bg-white/80 backdrop-blur border border-white/40 shadow-xl rounded-2xl overflow-hidden flex flex-col max-h-[70vh] min-h-[420px] sm:min-h-[480px]">
         <div id="chatBody" class="flex-1 overflow-y-auto scroll-smooth p-6 space-y-6 text-sm leading-relaxed">
           <div class="flex items-start gap-3 max-w-[80%] chat-fade-in">
             <!-- CHANGED: avatar div -> image -->

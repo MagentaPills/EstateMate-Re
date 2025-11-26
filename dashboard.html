@@ -22,9 +22,14 @@
     .chart-wrap{ height:18rem; }   /* prevents infinite growth */
     .table-wrap{ max-height:18rem; overflow:auto; }
     .scrolly{ max-height:22rem; overflow:auto; }
+    @media (max-width: 640px){
+      .chart-wrap{ height:14rem; }
+      .table-wrap{ max-height:14rem; }
+      .scrolly{ max-height:18rem; }
+    }    
   </style>
 </head>
-<body class="min-h-screen text-gray-900 flex flex-col">
+<body class="min-h-screen text-gray-900 flex flex-col overflow-x-hidden">
 
   <!-- HEADER -->
   <header class="bg-white border-b border-gray-100 relative overflow-hidden">
