@@ -18,28 +18,34 @@
           </span>
         </a>
       </div>
+      <!-- Desktop nav -->
       <nav class="hidden md:flex items-center gap-6 text-[15px] font-medium text-gray-700">
-        <!-- Mobile hamburger -->
-        <button
-          id="mobileMenuBtn"
-          class="md:hidden inline-flex items-center justify-center rounded-lg p-2 border border-gray-200 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          aria-label="Open navigation"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </button>
         <a href="dashboard.html" class="hover:text-indigo-600 transition">Dashboard</a>
-        <a href="browse.html"   class="hover:text-indigo-600 transition">Browse</a>
+        <a href="browse.html"   class="text-indigo-600 font-semibold">Browse</a>
         <a href="map.html"      class="hover:text-indigo-600 transition">Map</a>
         <a href="about.html"    class="hover:text-indigo-600 transition">About</a>
-        <a href="contact.html"  class="text-indigo-600 font-semibold">Contact</a>
+        <a href="contact.html"  class="hover:text-indigo-600 transition">Contact</a>
         <a id="signInBtn" href="auth.html"
-           class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-full hover:bg-indigo-700 transition whitespace-nowrap hidden">Sign in</a>
+           class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-full hover:bg-indigo-700 transition whitespace-nowrap hidden">
+          Sign in
+        </a>
         <button id="signOutBtn" type="button"
-           class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-full hover:bg-indigo-700 transition whitespace-nowrap hidden">Sign out</button>
+           class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-full hover:bg-indigo-700 transition whitespace-nowrap hidden">
+          Sign out
+        </button>
       </nav>
+
+      <!-- Mobile hamburger (outside nav, sibling) -->
+      <button
+        id="mobileMenuBtn"
+        class="md:hidden inline-flex items-center justify-center rounded-lg p-2 border border-gray-200 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        aria-label="Open navigation"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
     </div>
   </header>
 
