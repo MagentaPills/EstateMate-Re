@@ -1084,9 +1084,8 @@
         const bathrooms = src.bathrooms ?? '?';
         const sizeSqft  = src.size_sqft;
         const amenities = src.amenities;
-
         card.innerHTML = `
-          <div class="flex gap-3">
+          <div class="flex flex-col sm:flex-row gap-3">
             <div class="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
               <img src="${thumb}" alt="Property photo" class="w-full h-full object-cover" loading="lazy" />
             </div>
