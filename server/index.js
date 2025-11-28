@@ -27,7 +27,7 @@ const MODEL_BASE =
 
 const RECOMMENDER_URL =
   process.env.RECOMMENDER_URL ||
-  'https://estate-mate-recommendation-model-338850593340.europe-west1.run.app/recommend';
+  'https://estate-mate-recommender-338850593340.europe-west1.run.app/recommend';
 
   const bigQueryOptions = { projectId: BQ_PROJECT, location: BQ_LOCATION };
 
