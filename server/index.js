@@ -23,7 +23,7 @@ const N8N_CHAT_URL =
 
 const MODEL_BASE =
   process.env.MODEL_BASE ||
-  'https://vertex-ml-app-338850593340.europe-west1.run.app';
+  'https://estatemate-priceprediction-model-338850593340.europe-west1.run.app';
 
 const RECOMMENDER_URL =
   process.env.RECOMMENDER_URL ||
