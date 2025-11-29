@@ -700,6 +700,15 @@
       const prefs = loadSavedPrefs(uid);
       echoPrefs(prefs);
 
+      if (!prefs || Object.keys(prefs).length === 0) {
+        recList.innerHTML = `
+          <div class="py-3 text-sm text-gray-600">
+            Set your preferences on the home page to see recommended listings.
+          </div>`;
+        recBadge.textContent = "0 shown";
+        return;
+      }
+
       const community = (prefs.community || prefs.areas || "").toString().split(",")[0]?.trim() || "";
       const payload = {
         community,
